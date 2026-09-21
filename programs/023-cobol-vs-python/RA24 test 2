@@ -1,0 +1,48 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. STATS.
+      *> Author: TusharB-07
+
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+
+       01 WS-NUMS.
+          05 WS-NUM PIC S9(4) OCCURS 10 TIMES.
+
+       01 WS-SUM       PIC S9(6) VALUE 0.
+       01 WS-MIN       PIC S9(4).
+       01 WS-MAX       PIC S9(4).
+       01 WS-AVG       PIC 9(3)V99.
+       01 WS-I         PIC 9(2).
+
+       PROCEDURE DIVISION.
+
+           PERFORM VARYING WS-I FROM 1 BY 1
+               UNTIL WS-I > 10
+               ACCEPT WS-NUM(WS-I)
+               ADD WS-NUM(WS-I) TO WS-SUM
+           END-PERFORM
+
+           MOVE WS-NUM(1) TO WS-MIN
+           MOVE WS-NUM(1) TO WS-MAX
+
+           PERFORM VARYING WS-I FROM 2 BY 1
+               UNTIL WS-I > 10
+
+               IF WS-NUM(WS-I) < WS-MIN
+                   MOVE WS-NUM(WS-I) TO WS-MIN
+               END-IF
+
+               IF WS-NUM(WS-I) > WS-MAX
+                   MOVE WS-NUM(WS-I) TO WS-MAX
+               END-IF
+
+           END-PERFORM
+
+           COMPUTE WS-AVG = WS-SUM / 10
+
+           DISPLAY "Sum: " WS-SUM
+           DISPLAY "Avg: " WS-AVG
+           DISPLAY "Min: " WS-MIN
+           DISPLAY "Max: " WS-MAX
+
+           STOP RUN.
