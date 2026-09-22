@@ -1,0 +1,61 @@
+IDENTIFICATION DIVISION.
+PROGRAM-ID. EXPRCALC.
+
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+01 WS-LINE          PIC X(50).
+01 WS-N1-STR        PIC X(10).
+01 WS-OP            PIC X(1).
+01 WS-N2-STR        PIC X(10).
+01 WS-N1            PIC S9(6).
+01 WS-N2            PIC S9(6).
+01 WS-RESULT        PIC S9(6)V99 VALUE 0.
+01 WS-RESULT-REC REDEFINES WS-RESULT.
+   05 WS-RES-INT    PIC S9(6).
+   05 WS-RES-DEC    PIC 99.
+01 WS-OUT-N1        PIC -ZZZZ9.
+01 WS-OUT-N2        PIC -ZZZZ9.
+01 WS-OUT-INT       PIC -ZZZZ9.
+
+PROCEDURE DIVISION.
+    ACCEPT WS-LINE
+    UNSTRING WS-LINE DELIMITED BY ALL " "
+        INTO WS-N1-STR WS-OP WS-N2-STR
+
+    MOVE FUNCTION NUMVAL(WS-N1-STR) TO WS-N1
+    MOVE FUNCTION NUMVAL(WS-N2-STR) TO WS-N2
+
+    EVALUATE WS-OP
+        WHEN "+"
+            COMPUTE WS-RESULT ROUNDED = WS-N1 + WS-N2
+        WHEN "-"
+            COMPUTE WS-RESULT ROUNDED = WS-N1 - WS-N2
+        WHEN "*"
+            COMPUTE WS-RESULT ROUNDED = WS-N1 * WS-N2
+        WHEN "/"
+            IF WS-N2 = 0
+                DISPLAY "Error: Division by zero"
+                STOP RUN
+            END-IF
+            COMPUTE WS-RESULT ROUNDED = WS-N1 / WS-N2
+        WHEN OTHER
+            DISPLAY "Error: Invalid operator"
+            STOP RUN
+    END-EVALUATE
+
+    MOVE WS-N1 TO WS-OUT-N1
+    MOVE WS-N2 TO WS-OUT-N2
+    MOVE WS-RES-INT TO WS-OUT-INT
+
+    IF WS-RES-DEC = 0
+        DISPLAY FUNCTION TRIM(WS-OUT-N1) " "
+                WS-OP " "
+                FUNCTION TRIM(WS-OUT-N2) " = "
+                FUNCTION TRIM(WS-OUT-INT)
+    ELSE
+        DISPLAY FUNCTION TRIM(WS-OUT-N1) " "
+                WS-OP " "
+                FUNCTION TRIM(WS-OUT-INT) "." WS-RES-DEC
+    END-IF
+
+    GOBACK.
